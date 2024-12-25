@@ -3,6 +3,7 @@
 <head>
     <style>
         body {
+            position: relative;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -12,7 +13,54 @@
             font-family: Arial, sans-serif;
             overflow: hidden;
         }
+        /* Background Stars */
+        .star-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .star-background .star {
+            position: absolute;
+            color: white;
+            font-size: 2px;
+            opacity: 0.8;
+            animation: twinkleBackground 5s infinite;
+        }
+        @keyframes twinkleBackground {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
 
+        /* Background Snowflakes */
+        .snow-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .snow-background .snowflake {
+            position: absolute;
+            top: -10px;
+            color: white;
+            font-size: 12px;
+            opacity: 0.8;
+            animation: fallBackground linear infinite;
+        }
+        @keyframes fallBackground {
+            to {
+                transform: translateY(100vh);
+                opacity: 0;
+            }
+        }
+
+        /* Main Card Styles */
         .card {
             position: relative;
             width: 300px;
@@ -23,19 +71,23 @@
             overflow: hidden;
             cursor: pointer;
             transition: transform 0.3s;
+            z-index: 1; /* Ensure the card is above background elements */
         }
-
         .card:hover {
             transform: translateY(-10px);
         }
-
         .tree {
             position: absolute;
             left: 50%;
             top: 40%;
             transform: translate(-50%, -50%);
+            animation: glow 2s infinite;
         }
-
+        @keyframes glow {
+            0% { filter: drop-shadow(0 0 5px rgba(45, 90, 63, 0.5)); }
+            50% { filter: drop-shadow(0 0 15px rgba(45, 90, 63, 0.8)); }
+            100% { filter: drop-shadow(0 0 5px rgba(45, 90, 63, 0.5)); }
+        }
         .tree-part {
             width: 0;
             height: 0;
@@ -45,47 +97,42 @@
             position: relative;
             margin-bottom: -30px;
         }
-
         .tree-trunk {
             width: 20px;
             height: 40px;
-            background: #5c4033;
+            background: linear-gradient(90deg, #4a3228, #5c4033, #4a3228);
             margin: 0 auto;
+            border-radius: 0 0 5px 5px;
         }
-
         .heart {
             position: absolute;
             width: 20px;
             height: 20px;
-            background: red;
+            background: #ff3366;
             transform: rotate(45deg);
             animation: pulse 1.5s infinite;
+            box-shadow: 0 0 15px rgba(255, 51, 102, 0.5);
         }
-
         .heart::before,
         .heart::after {
             content: '';
             width: 20px;
             height: 20px;
-            background: red;
+            background: #ff3366;
             border-radius: 50%;
             position: absolute;
         }
-
         .heart::before {
             left: -10px;
         }
-
         .heart::after {
             top: -10px;
         }
-
         @keyframes pulse {
             0% { transform: rotate(45deg) scale(1); }
             50% { transform: rotate(45deg) scale(1.2); }
             100% { transform: rotate(45deg) scale(1); }
         }
-
         .greeting {
             position: absolute;
             width: 100%;
@@ -95,46 +142,61 @@
             font-size: 24px;
             font-weight: bold;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            animation: colorChange 4s infinite;
         }
-
-        .snow, .star {
+        @keyframes colorChange {
+            0% { color: #c41e3a; }
+            50% { color: #ff3366; }
+            100% { color: #c41e3a; }
+        }
+        .snow {
             position: absolute;
             background: white;
             border-radius: 50%;
-            opacity: 0.8;
-        }
-
-        .snow {
-            width: 10px;
-            height: 10px;
+            pointer-events: none;
             animation: fall linear infinite;
+            z-index: 1;
         }
-
         @keyframes fall {
             to {
-                transform: translateY(400px);
+                transform: translateY(400px) rotate(360deg);
                 opacity: 0;
             }
         }
-
         .star {
-            width: 4px;
-            height: 4px;
-            background: gold;
+            position: absolute;
+            color: gold;
+            font-size: 24px;
             animation: twinkle 1.5s infinite;
         }
-
         @keyframes twinkle {
-            0%, 100% {
-                opacity: 0.5;
-            }
-            50% {
-                opacity: 1;
-            }
+            0% { opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
+        .message {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            bottom: 10%;
+            color: #666;
+            font-size: 14px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s;
+        }
+        .card:hover .message {
+            opacity: 1;
+            transform: translateY(0);
         }
     </style>
 </head>
 <body>
+    <!-- Background Elements -->
+    <div class="star-background" id="starBackground"></div>
+    <div class="snow-background" id="snowBackground"></div>
+
+    <!-- Main Card -->
     <div class="card" id="card">
         <div class="tree">
             <div class="tree-part"></div>
@@ -143,37 +205,108 @@
             <div class="tree-trunk"></div>
         </div>
         <div class="heart" style="left: 140px; top: 120px;"></div>
+        <div class="heart" style="left: 100px; top: 180px; animation-delay: 0.5s;"></div>
+        <div class="heart" style="left: 180px; top: 160px; animation-delay: 1s;"></div>
+        <div class="star" style="left: 145px; top: 80px;">⭐</div>
         <div class="greeting">圣诞快乐 ❥(^_-)</div>
+        <div class="message">愿你的圣诞节充满爱与温暖 💝</div>
     </div>
 
     <script>
-        function createSnow() {
-            const snow = document.createElement('div');
-            snow.className = 'snow';
-            snow.style.left = Math.random() * window.innerWidth + 'px';
-            snow.style.top = '-10px';
-            snow.style.animationDuration = Math.random() * 3 + 2 + 's';
-            document.body.appendChild(snow);
-
-            setTimeout(() => {
-                snow.remove();
-            }, 5000);
-        }
-
-        function createStar() {
+        // Background Stars
+        function createBackgroundStar() {
             const star = document.createElement('div');
             star.className = 'star';
-            star.style.left = Math.random() * window.innerWidth + 'px';
-            star.style.top = Math.random() * window.innerHeight + 'px';
-            document.body.appendChild(star);
-
+            // Random position
+            star.style.left = `${Math.random() * 100}%`;
+            star.style.top = `${Math.random() * 100}%`;
+            // Random size
+            const size = Math.random() * 2 + 1; // 1px to 3px
+            star.style.fontSize = `${size}px`;
+            // Random animation duration
+            const duration = Math.random() * 3 + 2; // 2s to 5s
+            star.style.animationDuration = `${duration}s`;
+            // Append to star background
+            document.getElementById('starBackground').appendChild(star);
+            // Remove star after animation completes
             setTimeout(() => {
                 star.remove();
-            }, 2000);
+                createBackgroundStar(); // Continuously create stars
+            }, duration * 1000);
         }
 
-        setInterval(createSnow, 200);
-        setInterval(createStar, 500);
+        // Initialize background stars
+        for(let i = 0; i < 100; i++) { // Number of stars
+            setTimeout(createBackgroundStar, Math.random() * 5000);
+        }
+
+        // Background Snowflakes
+        function createBackgroundSnowflake() {
+            const snowflake = document.createElement('div');
+            snowflake.className = 'snowflake';
+            snowflake.textContent = '❄'; // Unicode snowflake
+            // Random position
+            snowflake.style.left = `${Math.random() * 100}%`;
+            // Random size
+            const size = Math.random() * 10 + 10; // 10px to 20px
+            snowflake.style.fontSize = `${size}px`;
+            // Random animation duration
+            const duration = Math.random() * 5 + 5; // 5s to 10s
+            snowflake.style.animationDuration = `${duration}s`;
+            // Random delay
+            snowflake.style.animationDelay = `${Math.random() * 5}s`;
+            // Append to snow background
+            document.getElementById('snowBackground').appendChild(snowflake);
+            // Remove snowflake after animation completes
+            setTimeout(() => {
+                snowflake.remove();
+                createBackgroundSnowflake(); // Continuously create snowflakes
+            }, duration * 1000);
+        }
+
+        // Initialize background snowflakes
+        for(let i = 0; i < 50; i++) { // Number of initial snowflakes
+            setTimeout(createBackgroundSnowflake, Math.random() * 10000);
+        }
+
+        // Snowflakes inside the card (existing functionality)
+        function createCardSnow() {
+            const snow = document.createElement('div');
+            snow.className = 'snow';
+            
+            // Random size
+            const size = Math.random() * 6 + 4;
+            snow.style.width = `${size}px`;
+            snow.style.height = `${size}px`;
+            
+            // Random position within the card
+            snow.style.left = `${Math.random() * 300}px`;
+            
+            // Random opacity
+            snow.style.opacity = Math.random() * 0.7 + 0.3;
+            
+            // Random animation duration
+            const duration = Math.random() * 3 + 2;
+            snow.style.animation = `fall ${duration}s linear infinite`;
+            
+            // Add shadow effect
+            snow.style.boxShadow = '0 0 5px rgba(255, 255, 255, 0.8)';
+            
+            const card = document.getElementById('card');
+            card.appendChild(snow);
+            
+            setTimeout(() => {
+                snow.remove();
+            }, duration * 1000);
+        }
+        
+        // Increase snowflake creation frequency inside the card
+        setInterval(createCardSnow, 100);
+        
+        // Initial creation of a batch of snowflakes inside the card
+        for(let i = 0; i < 30; i++) {
+            setTimeout(createCardSnow, i * 100);
+        }
     </script>
 </body>
 </html>
